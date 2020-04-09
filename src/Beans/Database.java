@@ -19,13 +19,20 @@ public class Database extends Thread {
     public ArrayList<Pagina> pageList = new ArrayList<>();
     public HashMap<Integer, String> tabela = new HashMap<>();
     // 524203
-    public int hashPrime = 524203;
-    
+    public int hashPrime = 16273;
+
     private int overflow = 0;
     public double overflowPercentage;
     public int bucketSize = 0;
-    private int colisoes;
-    public int colisoesPercentage;
+    
+    
+    public int bucketId_busca;
+    public int paginaId_busca;
+    public String resultado_Busca;
+
+    private ArrayList<Double> colisoes = new ArrayList<>();
+    
+    public double colisoesPercentage;
 
     public void criarPaginas(double qtdTup) {
 
@@ -80,14 +87,14 @@ public class Database extends Thread {
         this.overflowPercentage = ((double) overflow / (double) tabela.size()) * 100;
 
         countColisoes();
-        
-        this.colisoesPercentage = 0;
-        
+
+        //this.colisoesPercentage = ;
+
         JOptionPane.showMessageDialog(null, "Database Criado");
 
     }
 
-    public void addBucketTupla(BucketTupla tupla, Bucket bucket) {
+    private void addBucketTupla(BucketTupla tupla, Bucket bucket) {
         if (bucket.bucketTuplas.size() <= bucketSize) {
             bucket.bucketTuplas.add(tupla);
         } else {
@@ -98,34 +105,42 @@ public class Database extends Thread {
         }
     }
 
-    public void countOverflow() {
+    private void countOverflow() {
+
         bucketList.stream().filter((bucket) -> (bucket.overflow != null)).forEachOrdered((bucket) -> {
-            bucketCheck(bucket.overflow);
+            oveflowCheck(bucket.overflow);
         });
     }
 
-    public void bucketCheck(Bucket k) {
+    private void oveflowCheck(Bucket k) {
         overflow += k.bucketTuplas.size();
         if (k.overflow != null) {
-            bucketCheck(k.overflow);
+            oveflowCheck(k.overflow);
         }
     }
     
-    public void countColisoes (){
-        
+    public void countColisoes() {
+        bucketList.forEach((bucket) -> {
+            coliCheck(bucket);
+        });
+    }
+
+    private void coliCheck(Bucket k) {
+        //TODO
+        colisoes.add((double) k.bucketTuplas.size() - 1  / (double) bucketSize);
+        if(k.overflow != null){
+            coliCheck(k.overflow);
+        }
     }
 
     public boolean buscarPalavra(int id) {
 
         int aux = hashPrime % id;
 
-        int bucketId;
-        int paginaId;
-
         for (Bucket bucket : bucketList) {
             if (bucket.bucketId == aux) {
 
-                bucketId = bucket.bucketId;
+                this.bucketId_busca = bucket.bucketId;
 
                 Bucket auxBucket = bucket;
                 while (auxBucket != null) {
@@ -133,13 +148,15 @@ public class Database extends Thread {
                     for (BucketTupla tuplas : auxBucket.bucketTuplas) {
                         if (tuplas.palavraId == id) {
 
-                            paginaId = tuplas.paginaId + 1;
+                            this.paginaId_busca = tuplas.paginaId;
 
                             for (Integer i : pageList.get(tuplas.paginaId).tuplas.keySet()) {
+                                
                                 if (i == id) {
-                                    JOptionPane.showMessageDialog(null, "Bucket : " + bucketId + "\n" + "Pagina Numero: " + paginaId + "\n" + "Palavra: " + pageList.get(tuplas.paginaId).tuplas.get(i));
+                                    this.resultado_Busca = pageList.get(tuplas.paginaId).tuplas.get(i);
                                     return true;
                                 }
+                                
                             }
                         }
                     }
@@ -153,5 +170,18 @@ public class Database extends Thread {
         }
 
         return false;
+    }
+    
+    public Bucket getBucket(int bucketId){
+        for(Bucket bucket: bucketList){
+            if(bucket.bucketId == bucketId){
+                return bucket;
+            }
+        }
+        return null;
+    }
+    
+    public Pagina getPagina(int pos){
+        return pageList.get(pos);
     }
 }
