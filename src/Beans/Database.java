@@ -18,19 +18,19 @@ public class Database extends Thread {
     public ArrayList<Bucket> bucketList = new ArrayList<>();
     public ArrayList<Pagina> pageList = new ArrayList<>();
     public HashMap<Integer, String> tabela = new HashMap<>();
-    // 524203
-    public int hashPrime = 16273;
+    // 16273
+    public int hashPrime = 524203;
 
     private int overflow = 0;
     public double overflowPercentage;
     public int bucketSize = 0;
-    
+    private int bucketCount = 0;
     
     public int bucketId_busca;
     public int paginaId_busca;
     public String resultado_Busca;
 
-    private ArrayList<Double> colisoes = new ArrayList<>();
+    private int colisoes = 0;
     
     public double colisoesPercentage;
 
@@ -87,8 +87,8 @@ public class Database extends Thread {
         this.overflowPercentage = ((double) overflow / (double) tabela.size()) * 100;
 
         countColisoes();
-
-        //this.colisoesPercentage = ;
+       
+        this.colisoesPercentage = (((double)colisoes / (double)bucketCount) / (double) bucketSize) * 100;
 
         JOptionPane.showMessageDialog(null, "Database Criado");
 
@@ -127,7 +127,8 @@ public class Database extends Thread {
 
     private void coliCheck(Bucket k) {
         //TODO
-        colisoes.add((double) k.bucketTuplas.size() - 1  / (double) bucketSize);
+        bucketCount++;
+        colisoes += k.bucketTuplas.size() ;
         if(k.overflow != null){
             coliCheck(k.overflow);
         }
