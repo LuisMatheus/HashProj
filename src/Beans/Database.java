@@ -18,19 +18,20 @@ public class Database extends Thread {
     public ArrayList<Bucket> bucketList = new ArrayList<>();
     public ArrayList<Pagina> pageList = new ArrayList<>();
     public HashMap<Integer, String> tabela = new HashMap<>();
-    // 16273
-    public int hashPrime = 524203;
+    
+    // 524203
+    public int hashPrime = 16273 ;
 
-    private int overflow = 0;
-    public double overflowPercentage;
+    private int overflowCount = 0;
+    public double overflowPercentage = 0;
+    
     public int bucketSize = 0;
     private int bucketCount = 0;
     
-    public int bucketId_busca;
-    public int paginaId_busca;
-    public String resultado_Busca;
+    public int bucketId_busca = 0;
+    public int paginaId_busca = 0;
 
-    private int colisoes = 0;
+    private int hitCount = 0;
     
     public double colisoesPercentage;
 
@@ -84,11 +85,11 @@ public class Database extends Thread {
 
         countOverflow();
 
-        this.overflowPercentage = ((double) overflow / (double) tabela.size()) * 100;
+        this.overflowPercentage = ((double) overflowCount / (double) tabela.size()) * 100;
 
         countColisoes();
        
-        this.colisoesPercentage = (((double)colisoes / (double)bucketCount) / (double) bucketSize) * 100;
+        this.colisoesPercentage = (((double)hitCount / (double)bucketCount) / (double) bucketSize) * 100;
 
         JOptionPane.showMessageDialog(null, "Database Criado");
 
@@ -106,14 +107,17 @@ public class Database extends Thread {
     }
 
     private void countOverflow() {
-
-        bucketList.stream().filter((bucket) -> (bucket.overflow != null)).forEachOrdered((bucket) -> {
+        
+        for(Bucket bucket : bucketList) {
+            if(bucket.overflow != null){
             oveflowCheck(bucket.overflow);
-        });
+            }
+        }
+        
     }
 
     private void oveflowCheck(Bucket k) {
-        overflow += k.bucketTuplas.size();
+        overflowCount += k.bucketTuplas.size();
         if (k.overflow != null) {
             oveflowCheck(k.overflow);
         }
@@ -126,9 +130,8 @@ public class Database extends Thread {
     }
 
     private void coliCheck(Bucket k) {
-        //TODO
         bucketCount++;
-        colisoes += k.bucketTuplas.size() ;
+        hitCount += k.bucketTuplas.size() ;
         if(k.overflow != null){
             coliCheck(k.overflow);
         }
@@ -154,7 +157,6 @@ public class Database extends Thread {
                             for (Integer i : pageList.get(tuplas.paginaId).tuplas.keySet()) {
                                 
                                 if (i == id) {
-                                    this.resultado_Busca = pageList.get(tuplas.paginaId).tuplas.get(i);
                                     return true;
                                 }
                                 
