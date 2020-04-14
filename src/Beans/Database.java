@@ -7,6 +7,7 @@ package Beans;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import javax.swing.JOptionPane;
 
 /**
@@ -19,7 +20,6 @@ public class Database extends Thread {
     public ArrayList<Pagina> pageList = new ArrayList<>();
     public HashMap<Integer, String> tabela = new HashMap<>();
     
-    // 16273
     public int hashPrime = 524203 ;
 
     private int overflowCount = 0;
@@ -55,12 +55,10 @@ public class Database extends Thread {
     public void criarBuckets() {
 
         int aux;
-        ArrayList<Integer> listaux = new ArrayList<>();
+        HashSet<Integer> listaux = new HashSet<>();
         for (Integer i : tabela.keySet()) {
             aux = (hashPrime % i);
-            if (!listaux.contains(aux)) {
-                listaux.add(aux);
-            }
+            listaux.add(aux);
         }
 
         listaux.forEach((integer) -> {

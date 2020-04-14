@@ -103,7 +103,7 @@ public class GUI extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         criarDatabase_texto = new javax.swing.JTextField();
-        criarDatabase_Button = new javax.swing.JButton();
+        criarIndex_Button = new javax.swing.JButton();
         tuplas_RadioButton = new javax.swing.JRadioButton();
         paginas_RadioButton = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
@@ -121,6 +121,8 @@ public class GUI extends javax.swing.JFrame {
         qtdOvr_Label = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         qtdCol_Label = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        tamBucket_label = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         arquivo_Table = new javax.swing.JTable();
@@ -139,14 +141,14 @@ public class GUI extends javax.swing.JFrame {
         setTitle("Hash");
         setResizable(false);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Criar Database"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Criar Index"));
 
         criarDatabase_texto.setName(""); // NOI18N
 
-        criarDatabase_Button.setText("Criar");
-        criarDatabase_Button.addActionListener(new java.awt.event.ActionListener() {
+        criarIndex_Button.setText("Criar");
+        criarIndex_Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                criarDatabase_ButtonActionPerformed(evt);
+                criarIndex_ButtonActionPerformed(evt);
             }
         });
 
@@ -168,7 +170,7 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(criarDatabase_texto, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(criarDatabase_Button))
+                    .addComponent(criarIndex_Button))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tuplas_RadioButton)
@@ -181,7 +183,7 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(criarDatabase_texto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                .addComponent(criarDatabase_Button)
+                .addComponent(criarIndex_Button)
                 .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(tuplas_RadioButton)
@@ -262,6 +264,10 @@ public class GUI extends javax.swing.JFrame {
 
         qtdCol_Label.setText("0");
 
+        jLabel9.setText("Tamanho Bucket:");
+
+        tamBucket_label.setText("0");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -288,7 +294,11 @@ public class GUI extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(qtdCol_Label)))
+                        .addComponent(qtdCol_Label))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(tamBucket_label)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -308,13 +318,17 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(qtdBucket_Label))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(tamBucket_label))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(qtdOvr_Label))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(qtdCol_Label)
                     .addComponent(jLabel5))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Tabelas"));
@@ -407,11 +421,11 @@ public class GUI extends javax.swing.JFrame {
                     .addComponent(jLabel7)
                     .addComponent(jLabel8))
                 .addGap(9, 9, 9)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -430,23 +444,23 @@ public class GUI extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void criarDatabase_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarDatabase_ButtonActionPerformed
+    private void criarIndex_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarIndex_ButtonActionPerformed
 
         if (tuplas_RadioButton.isSelected()) {
             db.criarPaginas(Integer.parseInt(criarDatabase_texto.getText()));
@@ -472,13 +486,15 @@ public class GUI extends javax.swing.JFrame {
         }
 
         qtdBucket_Label.setText("" + db.bucketList.size());
+        
+        tamBucket_label.setText("" + db.bucketSize);
 
         qtdOvr_Label.setText(String.format("%.2f", db.overflowPercentage) + " %");
 
         qtdCol_Label.setText(String.format("%.2f", db.colisoesPercentage) + " %");
 
 
-    }//GEN-LAST:event_criarDatabase_ButtonActionPerformed
+    }//GEN-LAST:event_criarIndex_ButtonActionPerformed
 
     private void buscarId_TextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarId_TextoActionPerformed
         // TODO add your handling code here:
@@ -549,8 +565,6 @@ public class GUI extends javax.swing.JFrame {
     private void paginas_TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paginas_TableMouseClicked
         int row = (int) paginas_Table.getValueAt(paginas_Table.rowAtPoint(evt.getPoint()), 0);
 
-        
-        
         paginas_Model.setColumnCount(0);
         paginas_Model.setRowCount(0);
 
@@ -634,8 +648,8 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton buscarId_Button;
     private javax.swing.JTextField buscarId_Texto;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton criarDatabase_Button;
     private javax.swing.JTextField criarDatabase_texto;
+    private javax.swing.JButton criarIndex_Button;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -645,6 +659,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -659,6 +674,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel qtdOvr_Label;
     private javax.swing.JLabel qtdPag_Label;
     private javax.swing.JLabel qtdTuplas_Label;
+    private javax.swing.JLabel tamBucket_label;
     private javax.swing.JRadioButton tuplas_RadioButton;
     // End of variables declaration//GEN-END:variables
 }
