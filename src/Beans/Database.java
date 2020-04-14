@@ -19,8 +19,8 @@ public class Database extends Thread {
     public ArrayList<Pagina> pageList = new ArrayList<>();
     public HashMap<Integer, String> tabela = new HashMap<>();
     
-    // 524203
-    public int hashPrime = 16273 ;
+    // 16273
+    public int hashPrime = 524203 ;
 
     private int overflowCount = 0;
     public double overflowPercentage = 0;
