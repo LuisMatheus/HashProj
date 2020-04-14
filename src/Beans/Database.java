@@ -30,8 +30,6 @@ public class Database extends Thread {
     
     public int bucketId_busca = 0;
     public int paginaId_busca = 0;
-
-    private int hitCount = 0;
     
     public double colisoesPercentage;
 
@@ -89,7 +87,7 @@ public class Database extends Thread {
 
         countColisoes();
        
-        this.colisoesPercentage = (((double)hitCount / (double)bucketCount) / (double) bucketSize) * 100;
+        this.colisoesPercentage = (((double)tabela.size() / (double)bucketCount) / (double) bucketSize) * 100;
 
         JOptionPane.showMessageDialog(null, "Database Criado");
 
@@ -131,7 +129,6 @@ public class Database extends Thread {
 
     private void coliCheck(Bucket k) {
         bucketCount++;
-        hitCount += k.bucketTuplas.size() ;
         if(k.overflow != null){
             coliCheck(k.overflow);
         }

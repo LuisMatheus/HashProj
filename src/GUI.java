@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -23,80 +22,74 @@ import javax.swing.table.DefaultTableModel;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Matheus
  */
-
-
 public class GUI extends javax.swing.JFrame {
-    
+
     public static Database db = new Database();
-    
+
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
-        
+
         //ler arquivo
         ArrayList<String> arquivo = new ArrayList<>();
-        
+
         File file = new File("words.txt");
         try {
             String st;
             BufferedReader br = new BufferedReader(new FileReader(file));
-            while((st = br.readLine())!= null){
+            while ((st = br.readLine()) != null) {
                 arquivo.add(st);
             }
-            
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-           
+
         //numeros aleatorios
         ArrayList<Integer> numbers = new ArrayList<>();
-        IntStream.range(1, arquivo.size()+1).forEach(numbers::add);
+        IntStream.range(1, arquivo.size() + 1).forEach(numbers::add);
         Collections.shuffle(numbers);
-        
+
         //criar tabela
-        HashMap<Integer,String> tabela = new HashMap<>();
+        HashMap<Integer, String> tabela = new HashMap<>();
         for (int i = 0; i < arquivo.size(); i++) {
             tabela.put(numbers.get(i), arquivo.get(i));
         }
 
         //manda a tabela para o database
         db.tabela = tabela;
-        
+
         //preenche a tabela
-        
         arquivo_Table.setModel(arquivo_Model);
-        
+
         arquivo_Model.setColumnCount(2);
-                
+
         arquivo_Table.getColumnModel().getColumn(0).setHeaderValue("Id");
         arquivo_Table.getColumnModel().getColumn(1).setHeaderValue("Palavra");
-        
+
         arquivo_Table.getColumnModel().getColumn(0).setMaxWidth(40);
-        
+
         for (int i = 1; i <= numbers.size(); i++) {
-            arquivo_Model.addRow(new Object[]{i,tabela.get(i)});
-        }      
-        
+            arquivo_Model.addRow(new Object[]{i, tabela.get(i)});
+        }
+
         qtdTuplas_Label.setText("" + arquivo.size());
-        
+
         //Bucket Table model
         bucket_Table.setModel(bucket_Model);
-        
+
         //Pagina Table Model
-        
         paginas_Table.setModel(paginas_Model);
-        
-    }    
-    
+
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -340,7 +333,6 @@ public class GUI extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        arquivo_Table.setRowSelectionAllowed(false);
         jScrollPane1.setViewportView(arquivo_Table);
 
         bucket_Table.setModel(new javax.swing.table.DefaultTableModel(
@@ -394,17 +386,17 @@ public class GUI extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jLabel7)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -441,7 +433,7 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -456,37 +448,36 @@ public class GUI extends javax.swing.JFrame {
 
     private void criarDatabase_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarDatabase_ButtonActionPerformed
 
-        if(tuplas_RadioButton.isSelected()){
+        if (tuplas_RadioButton.isSelected()) {
             db.criarPaginas(Integer.parseInt(criarDatabase_texto.getText()));
 
-        }else if(paginas_RadioButton.isSelected()){
-            db.criarPaginas(Math.ceil(Double.valueOf(db.tabela.size())/Double.parseDouble(criarDatabase_texto.getText())));
+        } else if (paginas_RadioButton.isSelected()) {
+            db.criarPaginas(Math.ceil(Double.valueOf(db.tabela.size()) / Double.parseDouble(criarDatabase_texto.getText())));
         }
-        
-        
+
         paginas_Model.setColumnCount(1);
         paginas_Table.getColumnModel().getColumn(0).setHeaderValue("Paginas");
-        for (int i = 0; i < db.pageList.size(); i++){
+        for (int i = 0; i < db.pageList.size(); i++) {
             paginas_Model.addRow(new Object[]{i});
         }
-        
-        qtdPag_Label.setText(""+db.pageList.size());
-        
+
+        qtdPag_Label.setText("" + db.pageList.size());
+
         db.criarBuckets();
-        
+
         bucket_Model.setColumnCount(1);
         bucket_Table.getColumnModel().getColumn(0).setHeaderValue("Hash");
-        for(Bucket bucket : db.bucketList){
+        for (Bucket bucket : db.bucketList) {
             bucket_Model.addRow(new Object[]{bucket.bucketId});
         }
-                       
-        qtdBucket_Label.setText(""+db.bucketList.size());
-        
+
+        qtdBucket_Label.setText("" + db.bucketList.size());
+
         qtdOvr_Label.setText(String.format("%.2f", db.overflowPercentage) + " %");
-        
+
         qtdCol_Label.setText(String.format("%.2f", db.colisoesPercentage) + " %");
 
-                
+
     }//GEN-LAST:event_criarDatabase_ButtonActionPerformed
 
     private void buscarId_TextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarId_TextoActionPerformed
@@ -498,99 +489,111 @@ public class GUI extends javax.swing.JFrame {
 
     private void buscarId_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarId_ButtonActionPerformed
         db.buscarPalavra(Integer.parseInt(buscarId_Texto.getText()));
-        
+
         bucket_Table.requestFocus();
-        
-        for(int i = 0 ; i < bucket_Table.getRowCount() ; i ++){
-            if((int)bucket_Model.getValueAt(i, 0) == db.bucketId_busca){
-                bucket_Table.changeSelection(i , 0, false, false);
+
+        for (int i = 0; i < bucket_Table.getRowCount(); i++) {
+            if ((int) bucket_Model.getValueAt(i, 0) == db.bucketId_busca) {
+                bucket_Table.changeSelection(i, 0, false, false);
             }
         }
-        
+
         paginas_Table.requestFocus();
-        
+
         paginas_Table.changeSelection(db.paginaId_busca, 0, false, false);
+        
+        arquivo_Table.requestFocus();
+        
+        arquivo_Table.changeSelection(Integer.parseInt(buscarId_Texto.getText()) - 1, 0, false, false);
+          
+
+
 
     }//GEN-LAST:event_buscarId_ButtonActionPerformed
 
     private void bucket_TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bucket_TableMouseClicked
-        
+
         int row = (int) bucket_Table.getValueAt(bucket_Table.rowAtPoint(evt.getPoint()), 0);
-        
+
         bucket_Model.setColumnCount(0);
-        
+
         bucket_Model.setRowCount(0);
-        
+
         bucket_Model.setColumnCount(2);
-        
+
         bucket_Table.getColumnModel().getColumn(0).setHeaderValue("Palavra Id");
         bucket_Table.getColumnModel().getColumn(1).setHeaderValue("Pagina");
-        
+
         Bucket bucketAux = db.getBucket(row);
-        
-        while(bucketAux != null){
-            for(BucketTupla tupla : bucketAux.bucketTuplas){
-                bucket_Model.addRow(new Object[]{tupla.palavraId,tupla.paginaId});
+
+        while (bucketAux != null) {
+            for (BucketTupla tupla : bucketAux.bucketTuplas) {
+                bucket_Model.addRow(new Object[]{tupla.palavraId, tupla.paginaId});
             }
-            bucket_Model.addRow(new Object[]{999999999,999999999});
+            bucket_Model.addRow(new Object[]{999999999, 999999999});
             bucketAux = bucketAux.overflow;
         }
-        
-        for(int i = 0 ; i < bucket_Table.getRowCount() ; i ++){
-            if((int)bucket_Model.getValueAt(i, 0) == Integer.parseInt(buscarId_Texto.getText())){
-                bucket_Table.changeSelection(i , 0, false, false);
+
+        for (int i = 0; i < bucket_Table.getRowCount(); i++) {
+            if ((int) bucket_Model.getValueAt(i, 0) == Integer.parseInt(buscarId_Texto.getText())) {
+                bucket_Table.changeSelection(i, 0, false, false);
             }
         }
-        
+
     }//GEN-LAST:event_bucket_TableMouseClicked
 
     private void bucket_TableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bucket_TableMouseReleased
-        
+
     }//GEN-LAST:event_bucket_TableMouseReleased
 
     private void paginas_TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paginas_TableMouseClicked
         int row = (int) paginas_Table.getValueAt(paginas_Table.rowAtPoint(evt.getPoint()), 0);
+
+        
         
         paginas_Model.setColumnCount(0);
         paginas_Model.setRowCount(0);
-        
+
         paginas_Model.setColumnCount(2);
-        
+
         paginas_Table.getColumnModel().getColumn(0).setHeaderValue("Id");
         paginas_Table.getColumnModel().getColumn(1).setHeaderValue("Palavra");
         
+        paginas_Table.getColumnModel().getColumn(0).setMaxWidth(40);
+
         Pagina paginaAux = db.getPagina(row);
-        
+
         for (Integer i : paginaAux.tuplas.keySet()) {
-            paginas_Model.addRow(new Object[]{i,paginaAux.tuplas.get(i)});
-            
+            paginas_Model.addRow(new Object[]{i, paginaAux.tuplas.get(i)});
+
         }
-        
-        for(int i = 0 ; i < paginas_Table.getRowCount() ; i ++){
-            if((int)paginas_Model.getValueAt(i, 0) == Integer.parseInt(buscarId_Texto.getText())){
-                paginas_Table.changeSelection(i , 0, false, false);
+
+        for (int i = 0; i < paginas_Table.getRowCount(); i++) {
+            if ((int) paginas_Model.getValueAt(i, 0) == Integer.parseInt(buscarId_Texto.getText())) {
+                paginas_Table.requestFocus();
+                paginas_Table.changeSelection(i, 0, false, false);
             }
         }
-        
+
     }//GEN-LAST:event_paginas_TableMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
+
         paginas_Model.setRowCount(0);
         paginas_Model.setColumnCount(0);
-        
+
         paginas_Model.setColumnCount(1);
         paginas_Table.getColumnModel().getColumn(0).setHeaderValue("Paginas");
-        for (int i = 0; i < db.pageList.size(); i++){
+        for (int i = 0; i < db.pageList.size(); i++) {
             paginas_Model.addRow(new Object[]{i});
         }
-        
+
         bucket_Model.setRowCount(0);
         bucket_Model.setColumnCount(0);
-        
+
         bucket_Model.setColumnCount(1);
         bucket_Table.getColumnModel().getColumn(0).setHeaderValue("Hash");
-        for(Bucket bucket : db.bucketList){
+        for (Bucket bucket : db.bucketList) {
             bucket_Model.addRow(new Object[]{bucket.bucketId});
         }
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -599,7 +602,7 @@ public class GUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -611,21 +614,20 @@ public class GUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new GUI().setVisible(true);
         });
-                     
+
     }
 
-    
     private DefaultTableModel bucket_Model = new DefaultTableModel();
     private DefaultTableModel paginas_Model = new DefaultTableModel();
     private DefaultTableModel arquivo_Model = new DefaultTableModel();
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable arquivo_Table;
     private javax.swing.JTable bucket_Table;
