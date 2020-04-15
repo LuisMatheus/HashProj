@@ -6,8 +6,10 @@
 package Beans;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.IntStream;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,7 +22,7 @@ public class Database extends Thread {
     public ArrayList<Pagina> pageList = new ArrayList<>();
     public HashMap<Integer, String> tabela = new HashMap<>();
     
-    public int hashPrime = 524203 ;
+    public int hashPrime = 524203;
 
     private int overflowCount = 0;
     public double overflowPercentage = 0;
@@ -35,17 +37,27 @@ public class Database extends Thread {
 
     public void criarPaginas(double qtdTup) {
 
-        int counter = 1;
+        ArrayList<Integer> numbers = new ArrayList<>();
+        IntStream.range(1, tabela.size() + 1).forEach(numbers::add);
+        Collections.shuffle(numbers);
+        
+        int counter = 0;
 
-        while (counter <= tabela.size()) {
+        while (counter < tabela.size()) {
 
             pageList.add(pageList.size(), new Pagina());
 
             for (int i = 0; i < qtdTup; i++) {
 
-                pageList.get(pageList.size() - 1).tuplas.put(counter, tabela.get(counter));
+                try{
+                    pageList.get(pageList.size() - 1).tuplas.put(numbers.get(counter), tabela.get(numbers.get(counter)));
+                }catch(IndexOutOfBoundsException e){
+                    //e.printStackTrace(System.out);
+                }finally{
+                    counter++;
+                }
 
-                counter++;
+                
             }
         }
 
@@ -66,10 +78,10 @@ public class Database extends Thread {
         });
 
         bucketSize = (int) Math.ceil((double) tabela.size() / (double) bucketList.size());
-
+        
         for (Pagina p : pageList) {
             for (Integer i : p.tuplas.keySet()) {
-                aux = (hashPrime % i);
+                aux = hashPrime % i;
                 for (Bucket bucket : bucketList) {
                     if (bucket.bucketId == aux) {
                         addBucketTupla(new BucketTupla(pageList.indexOf(p), i), bucket);
@@ -92,7 +104,7 @@ public class Database extends Thread {
     }
 
     private void addBucketTupla(BucketTupla tupla, Bucket bucket) {
-        if (bucket.bucketTuplas.size() <= bucketSize) {
+        if (bucket.bucketTuplas.size() < bucketSize) {
             bucket.bucketTuplas.add(tupla);
         } else {
             if (bucket.overflow == null) {
