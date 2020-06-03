@@ -1,20 +1,15 @@
 
-import Beans.Bucket;
-import Beans.BucketTupla;
 import Beans.Database;
-import Beans.Pagina;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import Beans.Grafo.Graph;
+import Beans.Grafo.GraphNode;
+import Beans.Tupla.Pagina;
+import Beans.Tupla.Tupla;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
-import javax.swing.UIManager;
+import javax.swing.JTextArea;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -28,66 +23,80 @@ import javax.swing.table.DefaultTableModel;
  */
 public class GUI extends javax.swing.JFrame {
 
-    public static Database db = new Database();
-
     /**
      * Creates new form GUI
+     *
+     * @throws java.lang.NoSuchFieldException
+     * @throws java.lang.IllegalAccessException
      */
-    public GUI() {
+    public static Database db = new Database();
+
+    public GUI() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         initComponents();
 
-        //ler arquivo
-        ArrayList<String> arquivo = new ArrayList<>();
+        jComboBox1.addItem("SELECT nome FROM empregado WHERE salario < 5000");
+        jComboBox1.addItem("SELECT nome , matricula FROM empregado WHERE salario < 5000");
+        jComboBox1.addItem("SELECT matri , nome , salario , lotacao FROM empregado WHERE matri = 7777");
 
-        File file = new File("words.txt");
-        try {
-            String st;
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            while ((st = br.readLine()) != null) {
-                arquivo.add(st);
+        db.carregarArquivos(50);
+
+        Field[] f = new Field[4];
+
+        DefaultTableModel empregado_Table_Model = new DefaultTableModel();
+        jTable2.setModel(empregado_Table_Model);
+
+        empregado_Table_Model.addColumn("matri");
+        empregado_Table_Model.addColumn("nome");
+        empregado_Table_Model.addColumn("salario");
+        empregado_Table_Model.addColumn("lotacao");
+
+        for (Pagina p : db.empregado) {
+            for (Tupla t : p.tuplas) {
+                f[0] = t.getClass().getDeclaredField("matri");
+                f[0].setAccessible(true);
+                f[1] = t.getClass().getDeclaredField("nome");
+                f[1].setAccessible(true);
+                f[2] = t.getClass().getDeclaredField("salario");
+                f[2].setAccessible(true);
+                f[3] = t.getClass().getDeclaredField("lotacao");
+                f[3].setAccessible(true);
+                empregado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t), f[3].getInt(t)});
             }
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            empregado_Table_Model.addRow(new Object[]{"=====", "=====", "=====", "====="});
         }
 
-        //numeros aleatorios
-        ArrayList<Integer> numbers = new ArrayList<>();
-        IntStream.range(1, arquivo.size() + 1).forEach(numbers::add);
-        Collections.shuffle(numbers);
+        DefaultTableModel dependente_Table_Model = new DefaultTableModel();
+        jTable1.setModel(dependente_Table_Model);
 
-        //criar tabela
-        HashMap<Integer, String> tabela = new HashMap<>();
-        for (int i = 0; i < arquivo.size(); i++) {
-            tabela.put(numbers.get(i), arquivo.get(i));
+        dependente_Table_Model.addColumn("matri_resp");
+        dependente_Table_Model.addColumn("nome");
+
+        for (Pagina p : db.dependente) {
+            for (Tupla t : p.tuplas) {
+                f[0] = t.getClass().getDeclaredField("matri_resp");
+                f[0].setAccessible(true);
+                f[1] = t.getClass().getDeclaredField("nome");
+                f[1].setAccessible(true);
+                dependente_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+            }
+            dependente_Table_Model.addRow(new Object[]{"==========", "=========="});
         }
 
-        //manda a tabela para o database
-        db.tabela = tabela;
+        DefaultTableModel departamento_Table_Model = new DefaultTableModel();
+        jTable3.setModel(departamento_Table_Model);
 
-        //preenche a tabela
-        arquivo_Table.setModel(arquivo_Model);
+        departamento_Table_Model.addColumn("cod_dep");
+        departamento_Table_Model.addColumn("nome");
 
-        arquivo_Model.setColumnCount(2);
-
-        arquivo_Table.getColumnModel().getColumn(0).setHeaderValue("Id");
-        arquivo_Table.getColumnModel().getColumn(1).setHeaderValue("Palavra");
-
-        arquivo_Table.getColumnModel().getColumn(0).setMaxWidth(40);
-
-        for (int i = 1; i <= numbers.size(); i++) {
-            arquivo_Model.addRow(new Object[]{i, tabela.get(i)});
+        for (Pagina p : db.departamento) {
+            for (Tupla t : p.tuplas) {
+                f[0] = t.getClass().getDeclaredField("cod_dep");
+                f[0].setAccessible(true);
+                f[1] = t.getClass().getDeclaredField("nome");
+                f[1].setAccessible(true);
+                departamento_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+            }
         }
-
-        qtdTuplas_Label.setText("" + arquivo.size());
-
-        //Bucket Table model
-        bucket_Table.setModel(bucket_Model);
-
-        //Pagina Table Model
-        paginas_Table.setModel(paginas_Model);
 
     }
 
@@ -100,332 +109,135 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
-        criarDatabase_texto = new javax.swing.JTextField();
-        criarIndex_Button = new javax.swing.JButton();
-        tuplas_RadioButton = new javax.swing.JRadioButton();
-        paginas_RadioButton = new javax.swing.JRadioButton();
-        jPanel2 = new javax.swing.JPanel();
-        buscarId_Texto = new javax.swing.JTextField();
-        buscarId_Button = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        qtdTuplas_Label = new javax.swing.JLabel();
-        qtdPag_Label = new javax.swing.JLabel();
-        qtdBucket_Label = new javax.swing.JLabel();
-        qtdOvr_Label = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        qtdCol_Label = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        tamBucket_label = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        arquivo_Table = new javax.swing.JTable();
+        jTable1 = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
-        bucket_Table = new javax.swing.JTable();
+        jTable2 = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
-        paginas_Table = new javax.swing.JTable();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-
-        buttonGroup1.add(tuplas_RadioButton);
-        buttonGroup1.add(paginas_RadioButton);
+        jTable3 = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable4 = new javax.swing.JTable();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Hash");
-        setResizable(false);
+        setTitle("Consultas");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Criar Index"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Consulta"));
 
-        criarDatabase_texto.setName(""); // NOI18N
-
-        criarIndex_Button.setText("Criar");
-        criarIndex_Button.addActionListener(new java.awt.event.ActionListener() {
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>());
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                criarIndex_ButtonActionPerformed(evt);
+                jComboBox1ActionPerformed(evt);
             }
         });
 
-        tuplas_RadioButton.setSelected(true);
-        tuplas_RadioButton.setText("Tuplas");
-        tuplas_RadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tuplas_RadioButtonActionPerformed(evt);
-            }
-        });
-
-        paginas_RadioButton.setText("Paginas");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(criarDatabase_texto, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(criarIndex_Button))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tuplas_RadioButton)
-                    .addComponent(paginas_RadioButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(criarDatabase_texto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                .addComponent(criarIndex_Button)
-                .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(tuplas_RadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(paginas_RadioButton)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Buscar(id)"));
-
-        buscarId_Texto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buscarId_TextoActionPerformed(evt);
-            }
-        });
-
-        buscarId_Button.setText("Buscar");
-        buscarId_Button.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buscarId_ButtonActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("Reiniciar");
+        jButton1.setText("Consultar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jButton1)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addContainerGap())
+        );
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable2);
+
+        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTable3);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Resultado"));
+
+        jTable4.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(jTable4);
+
+        jTextArea1.setEditable(false);
+        jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        jTextArea1.setRows(5);
+        jScrollPane5.setViewportView(jTextArea1);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(buscarId_Texto, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(buscarId_Button)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
-                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buscarId_Texto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buscarId_Button)
-                    .addComponent(jButton1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Estatisticas"));
-
-        jLabel1.setText("Quantidade de Tuplas:");
-
-        jLabel2.setText("Quantidade de Paginas Preenchidas:");
-
-        jLabel3.setText("Quantidade de Buckets:");
-
-        jLabel4.setText("Porcentagem de Overflows:");
-
-        qtdTuplas_Label.setText("0");
-
-        qtdPag_Label.setText("0");
-
-        qtdBucket_Label.setText("0");
-
-        qtdOvr_Label.setText("0");
-
-        jLabel5.setText("Porcentagem de Colisões");
-
-        qtdCol_Label.setText("0");
-
-        jLabel9.setText("Tamanho Bucket:");
-
-        tamBucket_label.setText("0");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(qtdTuplas_Label))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(qtdOvr_Label))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                        .addComponent(qtdPag_Label))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(qtdBucket_Label))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(qtdCol_Label))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(tamBucket_label)))
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(qtdTuplas_Label))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(qtdPag_Label))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(qtdBucket_Label))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(tamBucket_label))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(qtdOvr_Label))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(qtdCol_Label)
-                    .addComponent(jLabel5))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Tabelas"));
-
-        jScrollPane1.setBorder(null);
-
-        arquivo_Table.setAutoCreateRowSorter(true);
-        arquivo_Table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(arquivo_Table);
-
-        bucket_Table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        bucket_Table.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                bucket_TableMouseClicked(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                bucket_TableMouseReleased(evt);
-            }
-        });
-        jScrollPane2.setViewportView(bucket_Table);
-
-        paginas_Table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        paginas_Table.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                paginas_TableMouseClicked(evt);
-            }
-        });
-        jScrollPane3.setViewportView(paginas_Table);
-
-        jLabel6.setText("Arquivo");
-
-        jLabel7.setText("Buckets");
-
-        jLabel8.setText("Paginas");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel8))
-                .addGap(9, 9, 9)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap())
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -436,245 +248,182 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void criarIndex_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarIndex_ButtonActionPerformed
-
-        if (tuplas_RadioButton.isSelected()) {
-            db.criarPaginas(Integer.parseInt(criarDatabase_texto.getText()));
-
-        } else if (paginas_RadioButton.isSelected()) {
-            db.criarPaginas(Math.ceil(Double.valueOf(db.tabela.size()) / Double.parseDouble(criarDatabase_texto.getText())));
-        }
-
-        paginas_Model.setColumnCount(1);
-        paginas_Table.getColumnModel().getColumn(0).setHeaderValue("Paginas");
-        for (int i = 0; i < db.pageList.size(); i++) {
-            paginas_Model.addRow(new Object[]{i});
-        }
-
-        qtdPag_Label.setText("" + db.pageList.size());
-
-        db.criarBuckets();
-
-        bucket_Model.setColumnCount(1);
-        bucket_Table.getColumnModel().getColumn(0).setHeaderValue("Hash");
-        for (Bucket bucket : db.bucketList) {
-            bucket_Model.addRow(new Object[]{bucket.bucketId});
-        }
-
-        qtdBucket_Label.setText("" + db.bucketList.size());
-        
-        tamBucket_label.setText("" + db.bucketSize);
-
-        qtdOvr_Label.setText(String.format("%.2f", db.overflowPercentage) + " %");
-
-        qtdCol_Label.setText(String.format("%.2f", db.colisoesPercentage) + " %");
-
-
-    }//GEN-LAST:event_criarIndex_ButtonActionPerformed
-
-    private void buscarId_TextoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarId_TextoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_buscarId_TextoActionPerformed
-
-    private void tuplas_RadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tuplas_RadioButtonActionPerformed
-    }//GEN-LAST:event_tuplas_RadioButtonActionPerformed
-
-    private void buscarId_ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarId_ButtonActionPerformed
-        db.buscarPalavra(Integer.parseInt(buscarId_Texto.getText()));
-
-        bucket_Table.requestFocus();
-
-        for (int i = 0; i < bucket_Table.getRowCount(); i++) {
-            if ((int) bucket_Model.getValueAt(i, 0) == db.bucketId_busca) {
-                bucket_Table.changeSelection(i, 0, false, false);
-            }
-        }
-
-        paginas_Table.requestFocus();
-
-        paginas_Table.changeSelection(db.paginaId_busca, 0, false, false);
-        
-        arquivo_Table.requestFocus();
-        
-        arquivo_Table.changeSelection(Integer.parseInt(buscarId_Texto.getText()) - 1, 0, false, false);
-          
-
-
-
-    }//GEN-LAST:event_buscarId_ButtonActionPerformed
-
-    private void bucket_TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bucket_TableMouseClicked
-
-        int row = (int) bucket_Table.getValueAt(bucket_Table.rowAtPoint(evt.getPoint()), 0);
-
-        bucket_Model.setColumnCount(0);
-
-        bucket_Model.setRowCount(0);
-
-        bucket_Model.setColumnCount(2);
-
-        bucket_Table.getColumnModel().getColumn(0).setHeaderValue("Palavra Id");
-        bucket_Table.getColumnModel().getColumn(1).setHeaderValue("Pagina");
-
-        Bucket bucketAux = db.getBucket(row);
-
-        while (bucketAux != null) {
-            for (BucketTupla tupla : bucketAux.bucketTuplas) {
-                bucket_Model.addRow(new Object[]{tupla.palavraId, tupla.paginaId});
-            }
-            bucket_Model.addRow(new Object[]{999999999, 999999999});
-            bucketAux = bucketAux.overflow;
-        }
-
-        for (int i = 0; i < bucket_Table.getRowCount(); i++) {
-            if ((int) bucket_Model.getValueAt(i, 0) == Integer.parseInt(buscarId_Texto.getText())) {
-                bucket_Table.changeSelection(i, 0, false, false);
-            }
-        }
-
-    }//GEN-LAST:event_bucket_TableMouseClicked
-
-    private void bucket_TableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bucket_TableMouseReleased
-
-    }//GEN-LAST:event_bucket_TableMouseReleased
-
-    private void paginas_TableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paginas_TableMouseClicked
-        int row = (int) paginas_Table.getValueAt(paginas_Table.rowAtPoint(evt.getPoint()), 0);
-
-        paginas_Model.setColumnCount(0);
-        paginas_Model.setRowCount(0);
-
-        paginas_Model.setColumnCount(2);
-
-        paginas_Table.getColumnModel().getColumn(0).setHeaderValue("Id");
-        paginas_Table.getColumnModel().getColumn(1).setHeaderValue("Palavra");
-        
-        paginas_Table.getColumnModel().getColumn(0).setMaxWidth(40);
-
-        Pagina paginaAux = db.getPagina(row);
-
-        for (Integer i : paginaAux.tuplas.keySet()) {
-            paginas_Model.addRow(new Object[]{i, paginaAux.tuplas.get(i)});
-
-        }
-
-        for (int i = 0; i < paginas_Table.getRowCount(); i++) {
-            if ((int) paginas_Model.getValueAt(i, 0) == Integer.parseInt(buscarId_Texto.getText())) {
-                paginas_Table.requestFocus();
-                paginas_Table.changeSelection(i, 0, false, false);
-            }
-        }
-
-    }//GEN-LAST:event_paginas_TableMouseClicked
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
-        paginas_Model.setRowCount(0);
-        paginas_Model.setColumnCount(0);
-
-        paginas_Model.setColumnCount(1);
-        paginas_Table.getColumnModel().getColumn(0).setHeaderValue("Paginas");
-        for (int i = 0; i < db.pageList.size(); i++) {
-            paginas_Model.addRow(new Object[]{i});
-        }
-
-        bucket_Model.setRowCount(0);
-        bucket_Model.setColumnCount(0);
-
-        bucket_Model.setColumnCount(1);
-        bucket_Table.getColumnModel().getColumn(0).setHeaderValue("Hash");
-        for (Bucket bucket : db.bucketList) {
-            bucket_Model.addRow(new Object[]{bucket.bucketId});
-        }
+        /** <editor-fold>
+         * ArrayList<ArrayList<String>> args = new ArrayList<>();
+         *
+         * args = db.parser((String) jComboBox1.getSelectedItem());
+         *
+         * ArrayList<GraphNode> graph = new ArrayList<>();
+         *
+         * GraphNode res = new GraphNode();
+         *
+         * res.tipo = "RESULTADO"; for (String s : args.get(1)) { GraphNode g =
+         * new GraphNode(); graph.add(g); g.nome.add(s); g.tipo = "TABELA";
+         * g.arestas = new GraphNode(); g.arestas = res; }
+         *
+         * switch (jComboBox1.getSelectedIndex()) { case 0: res.nome.add("Busca
+         * Linear"); break; case 1: res.nome.add("Busca Linear"); break; case 2:
+         * res.nome.add("Busca Binaria"); break; case 3:
+         * System.out.println("3"); break; case 4: System.out.println("4");
+         * break; default: break;
+         *
+         * }
+         *
+         * String auxString = ""; int counter = 0;
+         *
+         * GraphNode cond = new GraphNode(); cond.tipo = "CONDICAO";
+         *
+         * res.arestas = new GraphNode(); res.arestas = cond;
+         *
+         * for (String s : args.get(2)) { auxString = auxString + s + " ";
+         * counter++; if (counter == 3) { cond.nome.add(auxString); auxString =
+         * ""; counter = 0; } }
+         *
+         * GraphNode proj = new GraphNode();
+         *
+         * cond.arestas = new GraphNode(); cond.arestas = proj;
+         *
+         * for (String s : args.get(0)) { proj.nome.add(s); }
+         *
+         * proj.tipo = "PROJECAO";
+         *
+         * Graph gra = new Graph(); gra.graph = graph;
+         *
+         * gra.drawGraph(jTextArea1);
+         *
+         * //tabela ArrayList<ArrayList<Tupla>> sel =
+         * db.processadorDeConsulta(gra);
+         *
+         * DefaultTableModel resultado_Table_Model = new DefaultTableModel();
+         * jTable4.setModel(resultado_Table_Model);
+         *
+         * switch (jComboBox1.getSelectedIndex()) { case 0:
+         * resultado_Table_Model.addColumn("nome"); for (Tupla t : sel.get(0)) {
+         * try { Field f = t.getClass().getDeclaredField("nome");
+         * f.setAccessible(true); resultado_Table_Model.addRow(new
+         * Object[]{(String) f.get(t)}); } catch (NoSuchFieldException |
+         * SecurityException | IllegalArgumentException | IllegalAccessException
+         * ex) { Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null,
+         * ex); } } break;
+         *
+         * case 1: resultado_Table_Model.addColumn("nome");
+         * resultado_Table_Model.addColumn("matri"); Field[] fi = new Field[2];
+         * for (Tupla t : sel.get(0)) { try { fi[0] =
+         * t.getClass().getDeclaredField("nome"); fi[0].setAccessible(true);
+         * fi[1] = t.getClass().getDeclaredField("matri");
+         * fi[1].setAccessible(true); resultado_Table_Model.addRow(new
+         * Object[]{(String) fi[0].get(t), (Integer) fi[1].get(t)}); } catch
+         * (NoSuchFieldException | SecurityException | IllegalArgumentException
+         * | IllegalAccessException ex) {
+         * Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex); }
+         * } break; case 2: resultado_Table_Model.addColumn("matri");
+         * resultado_Table_Model.addColumn("nome");
+         * resultado_Table_Model.addColumn("salario");
+         * resultado_Table_Model.addColumn("lotacao");
+         *
+         * Field[] f2 = new Field[4]; for (Tupla t : sel.get(0)) { try { f2[0] =
+         * t.getClass().getDeclaredField("matri"); f2[0].setAccessible(true);
+         * f2[1] = t.getClass().getDeclaredField("nome");
+         * f2[1].setAccessible(true); f2[2] =
+         * t.getClass().getDeclaredField("salario"); f2[2].setAccessible(true);
+         * f2[3] = t.getClass().getDeclaredField("lotacao");
+         * f2[3].setAccessible(true); resultado_Table_Model.addRow(new
+         * Object[]{(Integer) f2[0].get(t), (String) f2[1].get(t), (Double)
+         * f2[2].get(t), (Integer) f2[3].get(t)}); } catch (NoSuchFieldException
+         * | SecurityException | IllegalArgumentException |
+         * IllegalAccessException ex) {
+         * Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex); }
+         * }
+         *
+         * System.out.println("2"); break; case 3: System.out.println("3");
+         * break; case 4: System.out.println("4"); break; default: break;
+         *
+         * }
+         */
+        //</editor-fold>
+        
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
+     * @throws java.lang.NoSuchFieldException
      */
-    public static void main(String args[]) {
-
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    public static void main(String args[]) throws NoSuchFieldException {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+            /* Set the Nimbus look and feel */
+            //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+            /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+            * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+             */
 
-        //</editor-fold>
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            //</editor-fold>
+
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(GUI.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new GUI().setVisible(true);
-        });
+            try {
+                new GUI().setVisible(true);
 
+            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(GUI.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
 
-    private DefaultTableModel bucket_Model = new DefaultTableModel();
-    private DefaultTableModel paginas_Model = new DefaultTableModel();
-    private DefaultTableModel arquivo_Model = new DefaultTableModel();
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable arquivo_Table;
-    private javax.swing.JTable bucket_Table;
-    private javax.swing.JButton buscarId_Button;
-    private javax.swing.JTextField buscarId_Texto;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JTextField criarDatabase_texto;
-    private javax.swing.JButton criarIndex_Button;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JRadioButton paginas_RadioButton;
-    private javax.swing.JTable paginas_Table;
-    private javax.swing.JLabel qtdBucket_Label;
-    private javax.swing.JLabel qtdCol_Label;
-    private javax.swing.JLabel qtdOvr_Label;
-    private javax.swing.JLabel qtdPag_Label;
-    private javax.swing.JLabel qtdTuplas_Label;
-    private javax.swing.JLabel tamBucket_label;
-    private javax.swing.JRadioButton tuplas_RadioButton;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
+    private javax.swing.JTable jTable3;
+    private javax.swing.JTable jTable4;
+    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 }
