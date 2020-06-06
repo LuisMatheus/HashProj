@@ -5,6 +5,8 @@
  */
 package Beans;
 
+import Beans.Bucket.Bucket;
+import Beans.Bucket.BucketTupla;
 import Beans.Bucket.Hash;
 import Beans.Tupla.Pagina;
 import Beans.Tupla.Tupla;
@@ -51,8 +53,7 @@ public class Database extends Thread {
         consultas.add("SELECT\\s(\\w+|\\*)\\s,\\s(\\w+)\\sFROM\\s(\\w+)");
         consultas.add("SELECT\\s(\\w+|\\*)\\s,\\s(\\w+)\\sFROM\\s(\\w+)\\sWHERE\\s(\\w+)\\s([<>=])\\s(\\d+)");
         consultas.add("SELECT\\s(\\w+|\\*)\\sFROM\\s(\\w+)\\sWHERE\\s(\\w+)\\s([<>=])\\s(\\d+)");
-        consultas.add("SELECT\\s(\\w+|\\*)\\s,\\s(\\w+)\\s,\\s(\\w+)\\s,\\s(\\w+)\\sFROM\\s(\\w+)\\sWHERE\\s(\\w+)\\s([<>=])\\s(\\d+)");
-
+        consultas.add("SELECT\\s(\\w+|\\*)\\s,\\s(\\w+)\\s,\\s(\\w+)\\sFROM\\s(\\w+)\\sWHERE\\s(\\w+)\\s([<>=])\\s(\\d+)");
         consultas.add("SELECT\\s(\\w+|\\*)\\s,\\s(\\w+)\\sFROM\\s(\\w+)\\sWHERE\\s(\\w+)\\s([<>=])\\s(\\d+)");
         consultas.add("SELECT\\s(\\w+|\\*)\\sFROM\\s(\\w+)\\s,\\s(\\w+)\\sWHERE\\s(\\w+)\\s=\\s(\\w+)");
         consultas.add("SELECT\\s(\\w+|\\*)\\sFROM\\s(\\w+)\\sWHERE\\s(\\w+)\\s=\\s(\\w+)");
@@ -215,7 +216,6 @@ public class Database extends Thread {
 
                 }
                 Graph g = new DefaultGraph("default");
-                g.setAutoCreate(true);
 
                 for (String s : FROM) {
                     g.addNode(s).addAttribute("tabela", s);
@@ -241,6 +241,10 @@ public class Database extends Thread {
                         break;
                     case 2:
                         aux = "index seek";
+                        g.addNode(aux).addAttribute("operador", aux);
+                        break;
+                    case 3:
+                        aux = "index scan";
                         g.addNode(aux).addAttribute("operador", aux);
                         break;
                     default:
@@ -287,6 +291,7 @@ public class Database extends Thread {
                 WHERE = node;
             }
         }
+        ArrayList<Tupla> temp = new ArrayList<>();
         switch (OPERADOR.getAttribute("operador").toString()) {
             case "busca linear":
                 if (WHERE == null) {
@@ -318,7 +323,6 @@ public class Database extends Thread {
                 }
                 break;
             case "busca binaria":
-                ArrayList<Tupla> temp = new ArrayList<>();
 
                 switch (FROM.get(0).getAttribute("tabela").toString()) {
                     case "empregado":
@@ -337,22 +341,36 @@ public class Database extends Thread {
 
                 break;
             case "index seek":
-                ArrayList<Tupla> temp1 = new ArrayList<>();
 
                 switch (FROM.get(0).getAttribute("tabela").toString()) {
                     case "empregado":
-                        temp1.add(indexSeek(empregadoOrdered, WHERE.getAttribute("condicao").toString(),8192));
-                        resultado.add(temp1);
+                        temp.add(indexSeek(empregado, WHERE.getAttribute("condicao").toString(), 8192));
+                        resultado.add(temp);
                         break;
                     case "dependente":
-                        temp1.add(indexSeek(dependente, WHERE.getAttribute("condicao").toString(),2048));
-                        resultado.add(temp1);
+                        temp.add(indexSeek(dependente, WHERE.getAttribute("condicao").toString(), 2048));
+                        resultado.add(temp);
                         break;
                     case "departamento":
-                        temp1.add(indexSeek(departamento, WHERE.getAttribute("condicao").toString(),16));
-                        resultado.add(temp1);
+                        temp.add(indexSeek(departamento, WHERE.getAttribute("condicao").toString(), 16));
+                        resultado.add(temp);
                         break;
                 }
+                break;
+            case "index scan":
+
+                switch (FROM.get(0).getAttribute("tabela").toString()) {
+                    case "empregado":
+                        resultado.add(indexScan(empregado, WHERE.getAttribute("condicao").toString(), 8192));
+                        break;
+                    case "dependente":
+                        resultado.add(indexScan(dependente, WHERE.getAttribute("condicao").toString(), 2048));
+                        break;
+                    case "departamento":
+                        resultado.add(indexScan(departamento, WHERE.getAttribute("condicao").toString(), 16));
+                        break;
+                }
+
                 break;
             default:
                 break;
@@ -443,9 +461,37 @@ public class Database extends Thread {
     }
 
     //nao igualdade
-    public ArrayList<Tupla> indexScan(ArrayList<Pagina> tabela, String condicao) {
+    public ArrayList<Tupla> indexScan(ArrayList<Pagina> tabela, String condicao, int HashPrime) {
+        ArrayList<Tupla> res = new ArrayList<>();
+        Hash h = new Hash(HashPrime, tabela);
+        h.criarBuckets();
 
-        return null;
+        ScriptEngineManager factory = new ScriptEngineManager();
+        ScriptEngine engine = factory.getEngineByName("JavaScript");
+        try {
+            String[] atrib = (condicao.split("\\s"));
+            Bucket aux;
+            for (Bucket b : h.buckets) {
+                aux = b;
+                while (aux != null) {
+                    for (BucketTupla bt : aux.bucketTuplas) {
+                        if ((boolean) engine.eval(bt.tuplaId + atrib[1] + atrib[2])) {
+                            for (Tupla t : tabela.get(bt.paginaId).tuplas) {
+                                if (t.primaryKey == bt.tuplaId) {
+                                    res.add(t);
+                                }
+                            }
+                        }
+                    }
+                    aux = aux.overflow;
+                }
+            }
+
+        } catch (ScriptException | SecurityException | IllegalArgumentException ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return res;
     }
 
     public ArrayList<Tupla> nestedLoopJoin(ArrayList<Pagina> pag1, ArrayList<Pagina> pag2, String condicao) {

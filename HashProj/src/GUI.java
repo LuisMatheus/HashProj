@@ -36,7 +36,8 @@ public class GUI extends javax.swing.JFrame {
 
         jComboBox1.addItem("SELECT matricula , nome FROM empregado WHERE salario < 5000");
         jComboBox1.addItem("SELECT cod_dep , nome FROM departamento WHERE cod_dep = 15");
-        jComboBox1.addItem("SELECT matri , nome , salario , lotacao FROM empregado WHERE matri = 7777");
+        jComboBox1.addItem("SELECT * FROM empregado WHERE matri = 7777");
+        jComboBox1.addItem("SELECT matri , nome , salario FROM empregado WHERE matri < 3500");
 
         db.carregarArquivos(50);
 
@@ -333,6 +334,29 @@ public class GUI extends javax.swing.JFrame {
                         f[3] = t.getClass().getDeclaredField("lotacao");
                         f[3].setAccessible(true);
                         resultado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t), f[3].getInt(t)});
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                args.display();
+
+                break;
+            case 3:
+
+                resultado_Table_Model.addColumn("matri");
+                resultado_Table_Model.addColumn("nome");
+                resultado_Table_Model.addColumn("salario");
+
+                for (Tupla t : resultado.get(0)) {
+                    try {
+                        f[0] = t.getClass().getDeclaredField("matri");
+                        f[0].setAccessible(true);
+                        f[1] = t.getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        f[2] = t.getClass().getDeclaredField("salario");
+                        f[2].setAccessible(true);
+                        
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t)});
                     } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                         Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
