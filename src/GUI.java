@@ -1,16 +1,15 @@
 
 import Beans.Database;
-import Beans.Grafo.Graph;
-import Beans.Grafo.GraphNode;
 import Beans.Tupla.Pagina;
 import Beans.Tupla.Tupla;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JTextArea;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableModel;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.DefaultGraph;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -26,77 +25,21 @@ public class GUI extends javax.swing.JFrame {
     /**
      * Creates new form GUI
      *
-     * @throws java.lang.NoSuchFieldException
-     * @throws java.lang.IllegalAccessException
+     *
      */
     public static Database db = new Database();
 
     public GUI() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         initComponents();
 
-        jComboBox1.addItem("SELECT nome FROM empregado WHERE salario < 5000");
-        jComboBox1.addItem("SELECT nome , matricula FROM empregado WHERE salario < 5000");
-        jComboBox1.addItem("SELECT matri , nome , salario , lotacao FROM empregado WHERE matri = 7777");
-
-        db.carregarArquivos(50);
-
-        Field[] f = new Field[4];
-
-        DefaultTableModel empregado_Table_Model = new DefaultTableModel();
-        jTable2.setModel(empregado_Table_Model);
-
-        empregado_Table_Model.addColumn("matri");
-        empregado_Table_Model.addColumn("nome");
-        empregado_Table_Model.addColumn("salario");
-        empregado_Table_Model.addColumn("lotacao");
-
-        for (Pagina p : db.empregado) {
-            for (Tupla t : p.tuplas) {
-                f[0] = t.getClass().getDeclaredField("matri");
-                f[0].setAccessible(true);
-                f[1] = t.getClass().getDeclaredField("nome");
-                f[1].setAccessible(true);
-                f[2] = t.getClass().getDeclaredField("salario");
-                f[2].setAccessible(true);
-                f[3] = t.getClass().getDeclaredField("lotacao");
-                f[3].setAccessible(true);
-                empregado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t), f[3].getInt(t)});
-            }
-            empregado_Table_Model.addRow(new Object[]{"=====", "=====", "=====", "====="});
-        }
-
-        DefaultTableModel dependente_Table_Model = new DefaultTableModel();
-        jTable1.setModel(dependente_Table_Model);
-
-        dependente_Table_Model.addColumn("matri_resp");
-        dependente_Table_Model.addColumn("nome");
-
-        for (Pagina p : db.dependente) {
-            for (Tupla t : p.tuplas) {
-                f[0] = t.getClass().getDeclaredField("matri_resp");
-                f[0].setAccessible(true);
-                f[1] = t.getClass().getDeclaredField("nome");
-                f[1].setAccessible(true);
-                dependente_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
-            }
-            dependente_Table_Model.addRow(new Object[]{"==========", "=========="});
-        }
-
-        DefaultTableModel departamento_Table_Model = new DefaultTableModel();
-        jTable3.setModel(departamento_Table_Model);
-
-        departamento_Table_Model.addColumn("cod_dep");
-        departamento_Table_Model.addColumn("nome");
-
-        for (Pagina p : db.departamento) {
-            for (Tupla t : p.tuplas) {
-                f[0] = t.getClass().getDeclaredField("cod_dep");
-                f[0].setAccessible(true);
-                f[1] = t.getClass().getDeclaredField("nome");
-                f[1].setAccessible(true);
-                departamento_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
-            }
-        }
+        jComboBox1.addItem("SELECT matricula , nome FROM empregado WHERE salario < 5000");
+        jComboBox1.addItem("SELECT cod_dep , nome FROM departamento WHERE cod_dep = 15");
+        jComboBox1.addItem("SELECT * FROM empregado WHERE matri = 7777");
+        jComboBox1.addItem("SELECT matri , nome , salario FROM empregado WHERE matri < 3500");
+        jComboBox1.addItem("SELECT e.matri , e.nome , e.lotacao , d.nome FROM departamento d , empregado e WHERE e.lotacao = d.cod_dep AND e.lotacao > 10");
+        jComboBox1.addItem("SELECT e.matri , e.nome , e.salario , d.matri_resp , d.nome FROM dependente d , empregado e WHERE e.matri = d.matri_resp AND e.matri > 2500");
+        jComboBox1.addItem("SELECT e.nome , e.salario , d.cod_dep , d.nome FROM departamento d , empregado e WHERE e.lotacao = d.cod_dep");
+        jComboBox1.addItem("SELECT e.matri , e.nome , e.salario , d.matri_resp , d.nome FROM dependente d , empregado e WHERE d.matri_resp = e.matri");
 
     }
 
@@ -109,25 +52,43 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        Operador_Text = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jTable6 = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
+        jPanel5 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTable5 = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jButton2 = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable3 = new javax.swing.JTable();
+
+        buttonGroup1.add(jRadioButton1);
+        buttonGroup1.add(jRadioButton2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Consultas");
+        setSize(new java.awt.Dimension(0, 0));
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Consulta"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2), "Consulta"));
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>());
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -143,15 +104,23 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("Operador:");
+
+        Operador_Text.setEditable(false);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jButton1)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addGap(55, 55, 55)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(Operador_Text))
+                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -159,11 +128,42 @@ public class GUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jLabel1)
+                    .addComponent(Operador_Text, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2), "Resultado"));
+
+        jTable4.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(jTable4);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 703, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4)
+        );
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2), "Empregado"));
+
+        jTable6.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -174,7 +174,7 @@ public class GUI extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane6.setViewportView(jTable6);
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -189,6 +189,120 @@ public class GUI extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(jTable2);
 
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2), "Dependente"));
+
+        jTable5.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane5.setViewportView(jTable5);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(100, 100, 100))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+        );
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2), "Criar Index"));
+
+        jLabel2.setText("Valor:");
+
+        jRadioButton1.setSelected(true);
+        jRadioButton1.setText("Quantidade Tuplas Por Pagina");
+
+        jRadioButton2.setText("Quantidade Paginas");
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Criar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jRadioButton2)
+                    .addComponent(jRadioButton1)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1))
+                    .addComponent(jButton2)))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2), "Departamento"));
+
         jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -202,42 +316,15 @@ public class GUI extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(jTable3);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Resultado"));
-
-        jTable4.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane4.setViewportView(jTable4);
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
-        jTextArea1.setRows(5);
-        jScrollPane5.setViewportView(jTextArea1);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -245,33 +332,33 @@ public class GUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(3, 3, 3)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -281,102 +368,346 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        /** <editor-fold>
-         * ArrayList<ArrayList<String>> args = new ArrayList<>();
-         *
-         * args = db.parser((String) jComboBox1.getSelectedItem());
-         *
-         * ArrayList<GraphNode> graph = new ArrayList<>();
-         *
-         * GraphNode res = new GraphNode();
-         *
-         * res.tipo = "RESULTADO"; for (String s : args.get(1)) { GraphNode g =
-         * new GraphNode(); graph.add(g); g.nome.add(s); g.tipo = "TABELA";
-         * g.arestas = new GraphNode(); g.arestas = res; }
-         *
-         * switch (jComboBox1.getSelectedIndex()) { case 0: res.nome.add("Busca
-         * Linear"); break; case 1: res.nome.add("Busca Linear"); break; case 2:
-         * res.nome.add("Busca Binaria"); break; case 3:
-         * System.out.println("3"); break; case 4: System.out.println("4");
-         * break; default: break;
-         *
-         * }
-         *
-         * String auxString = ""; int counter = 0;
-         *
-         * GraphNode cond = new GraphNode(); cond.tipo = "CONDICAO";
-         *
-         * res.arestas = new GraphNode(); res.arestas = cond;
-         *
-         * for (String s : args.get(2)) { auxString = auxString + s + " ";
-         * counter++; if (counter == 3) { cond.nome.add(auxString); auxString =
-         * ""; counter = 0; } }
-         *
-         * GraphNode proj = new GraphNode();
-         *
-         * cond.arestas = new GraphNode(); cond.arestas = proj;
-         *
-         * for (String s : args.get(0)) { proj.nome.add(s); }
-         *
-         * proj.tipo = "PROJECAO";
-         *
-         * Graph gra = new Graph(); gra.graph = graph;
-         *
-         * gra.drawGraph(jTextArea1);
-         *
-         * //tabela ArrayList<ArrayList<Tupla>> sel =
-         * db.processadorDeConsulta(gra);
-         *
-         * DefaultTableModel resultado_Table_Model = new DefaultTableModel();
-         * jTable4.setModel(resultado_Table_Model);
-         *
-         * switch (jComboBox1.getSelectedIndex()) { case 0:
-         * resultado_Table_Model.addColumn("nome"); for (Tupla t : sel.get(0)) {
-         * try { Field f = t.getClass().getDeclaredField("nome");
-         * f.setAccessible(true); resultado_Table_Model.addRow(new
-         * Object[]{(String) f.get(t)}); } catch (NoSuchFieldException |
-         * SecurityException | IllegalArgumentException | IllegalAccessException
-         * ex) { Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null,
-         * ex); } } break;
-         *
-         * case 1: resultado_Table_Model.addColumn("nome");
-         * resultado_Table_Model.addColumn("matri"); Field[] fi = new Field[2];
-         * for (Tupla t : sel.get(0)) { try { fi[0] =
-         * t.getClass().getDeclaredField("nome"); fi[0].setAccessible(true);
-         * fi[1] = t.getClass().getDeclaredField("matri");
-         * fi[1].setAccessible(true); resultado_Table_Model.addRow(new
-         * Object[]{(String) fi[0].get(t), (Integer) fi[1].get(t)}); } catch
-         * (NoSuchFieldException | SecurityException | IllegalArgumentException
-         * | IllegalAccessException ex) {
-         * Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex); }
-         * } break; case 2: resultado_Table_Model.addColumn("matri");
-         * resultado_Table_Model.addColumn("nome");
-         * resultado_Table_Model.addColumn("salario");
-         * resultado_Table_Model.addColumn("lotacao");
-         *
-         * Field[] f2 = new Field[4]; for (Tupla t : sel.get(0)) { try { f2[0] =
-         * t.getClass().getDeclaredField("matri"); f2[0].setAccessible(true);
-         * f2[1] = t.getClass().getDeclaredField("nome");
-         * f2[1].setAccessible(true); f2[2] =
-         * t.getClass().getDeclaredField("salario"); f2[2].setAccessible(true);
-         * f2[3] = t.getClass().getDeclaredField("lotacao");
-         * f2[3].setAccessible(true); resultado_Table_Model.addRow(new
-         * Object[]{(Integer) f2[0].get(t), (String) f2[1].get(t), (Double)
-         * f2[2].get(t), (Integer) f2[3].get(t)}); } catch (NoSuchFieldException
-         * | SecurityException | IllegalArgumentException |
-         * IllegalAccessException ex) {
-         * Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex); }
-         * }
-         *
-         * System.out.println("2"); break; case 3: System.out.println("3");
-         * break; case 4: System.out.println("4"); break; default: break;
-         *
-         * }
-         */
-        //</editor-fold>
+        Graph args = new DefaultGraph("graph");
+
+        args.setAttribute("ui.stylesheet", "graph { fill-color: red; }");
+        args = db.parser((String) jComboBox1.getSelectedItem(), jComboBox1.getSelectedIndex());
+
+        ArrayList<ArrayList<Tupla>> resultado = db.processadorDeConsulta(args);
+
+        //tabela 
+        DefaultTableModel resultado_Table_Model = new DefaultTableModel();
+        jTable4.setModel(resultado_Table_Model);
+
         
-        
+
+        args.display(true);
+        Field[] f = new Field[5];
+        switch (jComboBox1.getSelectedIndex()) {
+            case 0:
+                Operador_Text.setText("TABLE SCAN(BUSCA LINEAR)");
+                resultado_Table_Model.addColumn("matri");
+                resultado_Table_Model.addColumn("nome");
+                for (Tupla t : resultado.get(0)) {
+                    try {
+                        f[0] = t.getClass().getDeclaredField("matri");
+                        f[0].setAccessible(true);
+                        f[1] = t.getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                break;
+            case 1:
+                Operador_Text.setText("BUSCA BINARIA");
+                resultado_Table_Model.addColumn("cod_dep");
+                resultado_Table_Model.addColumn("nome");
+                for (Tupla t : resultado.get(0)) {
+                    try {
+                        f[0] = t.getClass().getDeclaredField("cod_dep");
+                        f[0].setAccessible(true);
+                        f[1] = t.getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                break;
+            case 2:
+                Operador_Text.setText("INDEX SEEK");
+                resultado_Table_Model.addColumn("matri");
+                resultado_Table_Model.addColumn("nome");
+                resultado_Table_Model.addColumn("salario");
+                resultado_Table_Model.addColumn("lotacao");
+
+                for (Tupla t : resultado.get(0)) {
+                    try {
+                        f[0] = t.getClass().getDeclaredField("matri");
+                        f[0].setAccessible(true);
+                        f[1] = t.getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        f[2] = t.getClass().getDeclaredField("salario");
+                        f[2].setAccessible(true);
+                        f[3] = t.getClass().getDeclaredField("lotacao");
+                        f[3].setAccessible(true);
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t), f[3].getInt(t)});
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                break;
+            case 3:
+                Operador_Text.setText("INDEX SCAN");
+                resultado_Table_Model.addColumn("matri");
+                resultado_Table_Model.addColumn("nome");
+                resultado_Table_Model.addColumn("salario");
+
+                for (Tupla t : resultado.get(0)) {
+                    try {
+                        f[0] = t.getClass().getDeclaredField("matri");
+                        f[0].setAccessible(true);
+                        f[1] = t.getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        f[2] = t.getClass().getDeclaredField("salario");
+                        f[2].setAccessible(true);
+
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t)});
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            case 4:
+                Operador_Text.setText("NESTED LOOP JOIN");
+
+                resultado_Table_Model.addColumn("e.matri");
+                resultado_Table_Model.addColumn("e.nome");
+                resultado_Table_Model.addColumn("e.lotacao");
+                resultado_Table_Model.addColumn("d.nome");
+                for (int i = 0; i < resultado.get(0).size(); i++) {
+                    try {
+                        f[0] = resultado.get(0).get(0).getClass().getDeclaredField("matri");
+                        f[0].setAccessible(true);
+                        f[1] = resultado.get(0).get(0).getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        f[2] = resultado.get(0).get(0).getClass().getDeclaredField("lotacao");
+                        f[2].setAccessible(true);
+                        f[3] = resultado.get(1).get(0).getClass().getDeclaredField("nome");
+                        f[3].setAccessible(true);
+
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(resultado.get(0).get(i)), (String) f[1].get(resultado.get(0).get(i)), f[2].getInt(resultado.get(0).get(i)), (String) f[3].get(resultado.get(1).get(i))});
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            case 5:
+                Operador_Text.setText("NESTED LOOP JOIN HASH");
+
+                break;
+            case 6:
+                Operador_Text.setText("MERGE JOIN");
+                resultado_Table_Model.addColumn("e.nome");
+                resultado_Table_Model.addColumn("e.salario");
+                resultado_Table_Model.addColumn("d.cod_dep");
+                resultado_Table_Model.addColumn("d.nome");
+                for (int i = 0; i < resultado.get(0).size(); i++) {
+                    try {
+                        f[0] = resultado.get(0).get(0).getClass().getDeclaredField("nome");
+                        f[0].setAccessible(true);
+                        f[1] = resultado.get(0).get(0).getClass().getDeclaredField("salario");
+                        f[1].setAccessible(true);
+                        f[2] = resultado.get(1).get(0).getClass().getDeclaredField("cod_dep");
+                        f[2].setAccessible(true);
+                        f[3] = resultado.get(1).get(0).getClass().getDeclaredField("nome");
+                        f[3].setAccessible(true);
+
+                        resultado_Table_Model.addRow(new Object[]{(String) f[0].get(resultado.get(0).get(i)), f[1].getDouble(resultado.get(0).get(i)), f[2].getInt(resultado.get(1).get(i)), (String) f[3].get(resultado.get(1).get(i))});
+
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                break;
+            case 7:
+                Operador_Text.setText("HASH JOIN");
+                resultado_Table_Model.addColumn("e.matri");
+                resultado_Table_Model.addColumn("e.nome");
+                resultado_Table_Model.addColumn("e.salario");
+                resultado_Table_Model.addColumn("d.matri_resp");
+                resultado_Table_Model.addColumn("d.nome");
+                for (int i = 0; i < resultado.get(0).size(); i++) {
+                    try {
+                        f[0] = resultado.get(0).get(0).getClass().getDeclaredField("matri");
+                        f[0].setAccessible(true);
+                        f[1] = resultado.get(0).get(0).getClass().getDeclaredField("nome");
+                        f[1].setAccessible(true);
+                        f[2] = resultado.get(0).get(0).getClass().getDeclaredField("salario");
+                        f[2].setAccessible(true);
+                        f[3] = resultado.get(1).get(0).getClass().getDeclaredField("matri_resp");
+                        f[3].setAccessible(true);
+                        f[4] = resultado.get(1).get(0).getClass().getDeclaredField("nome");
+                        f[4].setAccessible(true);
+
+                        resultado_Table_Model.addRow(new Object[]{f[0].getInt(resultado.get(0).get(i)), (String) f[1].get(resultado.get(0).get(i)), f[2].getDouble(resultado.get(0).get(i)), f[3].getInt(resultado.get(1).get(i)), (String) f[4].get(resultado.get(1).get(i))});
+
+                    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                        Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                }
+                break;
+        }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (jRadioButton1.isSelected()) {
+            db.carregarArquivos(Integer.parseInt(jTextField1.getText()));
+        } else {
+            db.carregarArquivos((int) Math.ceil(db.arquivo.size() / Integer.parseInt(jTextField1.getText())));;
+        }
+
+        Field[] f = new Field[4];
+
+        DefaultTableModel empregado_ORDERED_Table_Model = new DefaultTableModel();
+        jTable2.setModel(empregado_ORDERED_Table_Model);
+
+        empregado_ORDERED_Table_Model.addColumn("matri");
+        empregado_ORDERED_Table_Model.addColumn("nome");
+        empregado_ORDERED_Table_Model.addColumn("salario");
+        empregado_ORDERED_Table_Model.addColumn("lotacao");
+
+        for (Pagina p : db.empregado_Matri_Ordered) {
+            for (Tupla t : p.tuplas) {
+                try {
+                    f[0] = t.getClass().getDeclaredField("matri");
+                    f[0].setAccessible(true);
+                    f[1] = t.getClass().getDeclaredField("nome");
+                    f[1].setAccessible(true);
+                    f[2] = t.getClass().getDeclaredField("salario");
+                    f[2].setAccessible(true);
+                    f[3] = t.getClass().getDeclaredField("lotacao");
+                    f[3].setAccessible(true);
+                    empregado_ORDERED_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t), f[3].getInt(t)});
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            empregado_ORDERED_Table_Model.addRow(new Object[]{"=====", "=====", "=====", "====="});
+        }
+
+        DefaultTableModel empregado_Table_Model = new DefaultTableModel();
+        jTable6.setModel(empregado_Table_Model);
+
+        empregado_Table_Model.addColumn("matri");
+        empregado_Table_Model.addColumn("nome");
+        empregado_Table_Model.addColumn("salario");
+        empregado_Table_Model.addColumn("lotacao");
+
+        for (Pagina p : db.empregado) {
+            for (Tupla t : p.tuplas) {
+                try {
+                    f[0] = t.getClass().getDeclaredField("matri");
+                    f[0].setAccessible(true);
+                    f[1] = t.getClass().getDeclaredField("nome");
+                    f[1].setAccessible(true);
+                    f[2] = t.getClass().getDeclaredField("salario");
+                    f[2].setAccessible(true);
+                    f[3] = t.getClass().getDeclaredField("lotacao");
+                    f[3].setAccessible(true);
+                    empregado_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t), f[2].getDouble(t), f[3].getInt(t)});
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            empregado_Table_Model.addRow(new Object[]{"=====", "=====", "=====", "====="});
+        }
+
+        DefaultTableModel dependente_ORDERED_Table_Model = new DefaultTableModel();
+        jTable5.setModel(dependente_ORDERED_Table_Model);
+
+        dependente_ORDERED_Table_Model.addColumn("matri_resp");
+        dependente_ORDERED_Table_Model.addColumn("nome");
+
+        for (Pagina p : db.dependente_MatriResp_Ordered) {
+            for (Tupla t : p.tuplas) {
+                try {
+                    f[0] = t.getClass().getDeclaredField("matri_resp");
+                    f[0].setAccessible(true);
+                    f[1] = t.getClass().getDeclaredField("nome");
+                    f[1].setAccessible(true);
+                    dependente_ORDERED_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            dependente_ORDERED_Table_Model.addRow(new Object[]{"==========", "=========="});
+        }
+
+        DefaultTableModel dependente_Table_Model = new DefaultTableModel();
+        jTable1.setModel(dependente_Table_Model);
+
+        dependente_Table_Model.addColumn("matri_resp");
+        dependente_Table_Model.addColumn("nome");
+
+        for (Pagina p : db.dependente) {
+            for (Tupla t : p.tuplas) {
+                try {
+                    f[0] = t.getClass().getDeclaredField("matri_resp");
+                    f[0].setAccessible(true);
+                    f[1] = t.getClass().getDeclaredField("nome");
+                    f[1].setAccessible(true);
+                    dependente_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            dependente_Table_Model.addRow(new Object[]{"==========", "=========="});
+        }
+
+        DefaultTableModel departamento_Table_Model = new DefaultTableModel();
+        jTable3.setModel(departamento_Table_Model);
+
+        departamento_Table_Model.addColumn("cod_dep");
+        departamento_Table_Model.addColumn("nome");
+
+        for (Pagina p : db.departamento) {
+            for (Tupla t : p.tuplas) {
+                try {
+                    f[0] = t.getClass().getDeclaredField("cod_dep");
+                    f[0].setAccessible(true);
+                    f[1] = t.getClass().getDeclaredField("nome");
+                    f[1].setAccessible(true);
+                    departamento_Table_Model.addRow(new Object[]{f[0].getInt(t), (String) f[1].get(t)});
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -384,6 +715,7 @@ public class GUI extends javax.swing.JFrame {
      */
     public static void main(String args[]) throws NoSuchFieldException {
         try {
+            System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
             /* Set the Nimbus look and feel */
             //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
             /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -411,19 +743,33 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField Operador_Text;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
     private javax.swing.JTable jTable4;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTable jTable5;
+    private javax.swing.JTable jTable6;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

@@ -14,10 +14,10 @@ public class departamentoTupla extends Tupla {
     int cod_dep;
     String nome = new String();
     
-    public departamentoTupla(int cod_dep, String nome, int primaryKey) {
+    public departamentoTupla(int cod_dep, String nome) {
         this.cod_dep = cod_dep;
         this.nome = nome;
-        this.primaryKey = primaryKey;
+        this.primaryKey = cod_dep;
     }
 
 }

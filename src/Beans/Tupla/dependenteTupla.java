@@ -13,10 +13,10 @@ public class dependenteTupla extends Tupla{
     int matri_resp;
     String nome = new String();
     
-    public dependenteTupla(int matri_resp , String nome,int primaryKey){
+    public dependenteTupla(int matri_resp , String nome){
         this.matri_resp = matri_resp;
         this.nome = nome;
-        this.primaryKey = primaryKey;
+        this.primaryKey = matri_resp;
     }
     
 }

@@ -11,11 +11,11 @@ package Beans.Bucket;
  */
 public class BucketTupla {
     public Integer paginaId;
-    public Integer palavraId;
+    public Integer tuplaId;
 
     public BucketTupla(Integer paginaId, Integer palavraId) {
         this.paginaId = paginaId;
-        this.palavraId = palavraId;
+        this.tuplaId = palavraId;
     }
     
     
